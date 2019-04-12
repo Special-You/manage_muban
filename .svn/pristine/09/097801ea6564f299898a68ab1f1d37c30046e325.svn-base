@@ -1,0 +1,249 @@
+<template>
+    <div>
+        <Banner></Banner>
+        <Add></Add>
+        <!--<Row :style="{marginTop:'-20px', marginBottom:'10px'}">-->
+            <!--<Col :sm="22" :md="22" :lg="22">-->
+                <!--.-->
+            <!--</Col>-->
+            <!--<Col :sm="2" :md="2" :lg="2">-->
+                <!--<Button type="dashed" shape="circle" @click="lunbo_open">添加</Button>-->
+            <!--</Col>-->
+        <!--</Row>-->
+        <!--查询结果-->
+        <Table :columns="lunbo_col" :data="lunbo_data" :loading='loading'></Table>
+        <div style="text-align: right;margin-top:20px;">
+            <Page :total="total_lunbo" :current="current_lunbo" prev-text="上一页" :page-size="10" next-text="下一页"
+                  @on-change="change_lunbo_page"></Page>
+        </div>
+    </div>
+</template>
+
+<script>
+    import Banner from '../../components/Barner'
+    import Add from '../../components/Add'
+
+    export default {
+        name: "LunBo",
+        components: {
+            Banner,
+            Add,
+        },
+        data() {
+            return {
+                lunbo_col: [
+                    {
+                        type: 'index',
+                        title: '序号',
+                        align: 'center',
+                        minWidth: 100,
+                        maxWidth: 100,
+                    },
+                    {
+                        title: '名称',
+                        key: 'name',
+                        align: 'center',
+                        minWidth: 100,
+                    },
+                    {
+                        title: '图片',
+                        key: 'picturePath',
+                        align: 'center',
+                        minWidth: 100,
+                        render: (h, params) => {
+                            let self = this;
+                            return h('div', [
+                                h('img', {
+                                    attrs: {
+                                        src: params.row.picturePath
+                                    },
+                                    style: {
+                                        display: 'inline-block',
+                                        width: '100px',
+                                        height: '60px'
+                                    },
+                                    // on:{
+                                    //     click(){
+                                    //         self.previewPicUrl = params.row.picture;
+                                    //         self.visible = true;
+                                    //     }
+                                    // }
+                                })
+                            ])
+                        }
+                    },
+                    {
+                        title: '跳转地址',
+                        key: 'targetUrl',
+                        align: 'center',
+                        minWidth: 100,
+                    },
+                    {
+                        title: '类型',
+                        key: 'type',
+                        align: 'center',
+                        minWidth: 100,
+                    },
+                    {
+                        title: '操作',
+                        key: 'operation',
+                        align: 'center',
+                        minWidth: 150,
+                        maxWidth: 150,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    style: {
+                                        marginRight: '5px',
+                                        //display: (params.row.status === '未审核' || params.row.status === '通过') ? 'inline-block' : 'none'
+                                    },
+                                    props: {
+                                        type: 'success',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            // this.id = params.row.id;
+                                            // this.updateRoleModle = true;
+                                            // this.queryAcess();
+                                            // this.updateRoles.name = params.row.name;
+                                            // this.updateRoles.description = params.row.description;
+                                            // $api.http.post($api.update_get_access_byRoleId, {
+                                            //     id: params.row.id
+                                            // })
+                                            //     .then(data => {
+                                            //         if (data.flag === 1) {
+                                            //             let all_list = [];
+                                            //             let list = [];
+                                            //             // console.log(this.flat_menu,55555)
+                                            //             for(let i = 0; i<data.data.length; i++){
+                                            //                 for(let j = 0; j<data.data[i].accesses.length; j++){
+                                            //                     list = data.data[i].accesses[j].id;
+                                            //                     all_list.push(list);
+                                            //                 }
+                                            //             }
+                                            //             for(let j = 0; j<all_list.length; j++){
+                                            //                 for(let i =0; i<this.flat_menu.length; i++){
+                                            //                     // console.log(this.flat_menu[i].id,1111)
+                                            //                     if(all_list[j] === this.flat_menu[i].id ){
+                                            //
+                                            //                         // this.flat_menu[i].checked = true;
+                                            //                         this.flat_menu[i].checked = true;
+                                            //                         // console.log(this.flat_menu[i],14111)
+                                            //                     }
+                                            //                 }
+                                            //             }
+                                            //
+                                            //         } else {
+                                            //             if (data.message === 'token is invalid') {
+                                            //                 this.$router.push('Login')
+                                            //             } else {
+                                            //                 this.$Message.warning(data.message);
+                                            //             }
+                                            //         }
+                                            //     })
+                                            //     .catch(error => {
+                                            //         this.$Message.error('网络请求失败！');
+                                            //     })
+                                        }
+                                    }
+                                }, '编辑'),
+                                // h('Button', {
+                                //     style: {
+                                //         marginRight: '5px',
+                                //         //display: (params.row.status === '未审核' || params.row.status === '不通过') ? 'inline-block' : 'none'
+                                //     },
+                                //     props: {
+                                //         type: 'error',
+                                //         size: 'small'
+                                //     },
+                                //     on: {
+                                //         click: () => {
+                                //
+                                //         }
+                                //     }
+                                // }, '不通过'),
+                                h('Poptip', {
+                                    props: {
+                                        placement: 'top',
+                                        confirm: true,
+                                        title: '确定删除吗？',
+                                        transfer: true
+                                    },
+                                    style: {
+                                        //display: (params.row.status === '未审核') ? 'inline-block' : 'none'
+                                    },
+                                    on: {
+                                        'on-ok': () => {
+                                            $api.http.post($api.role_delete, {
+                                                id: params.row.id
+                                            })
+                                                .then(data => {
+                                                    if ($api.validata(data, this)) {
+                                                        this.$Message.success('删除成功！');
+                                                        this.get_lunbo_all(this.current_lunbo);
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    this.$Message.error('网络请求失败');
+                                                })
+                                        }
+                                    },
+                                }, [
+                                    h('Button', {
+                                        props: {
+                                            type: 'error',
+                                            size: 'small'
+                                        }
+                                    }, '删除')
+                                ])
+                            ])
+                        }
+                    },
+                ],
+                lunbo_data: [],
+                loading: true,
+                total_lunbo: 1,
+                current_lunbo: 1,
+
+            }
+        },
+        created() {
+            this.get_lunbo_all(1);
+        },
+        methods: {
+            //分页查询轮播
+            get_lunbo_all(curr) {
+                let obj = {};
+                obj.size = 10;
+                obj.current = curr;
+                obj.params = {};
+                $api.http.post($api.banner_page, obj)
+                    .then(data => {
+                        if ($api.validata(data, this)) {
+                            this.lunbo_data = data.data.records;
+                            this.total_lunbo = data.data.total;
+                            this.loading = false;
+                        }
+                    })
+                    .catch(error => {
+                        this.$Message.error('数据请求失败');
+                    })
+            },
+            change_lunbo_page(curr) {
+                this.current_lunbo = curr;
+                this.get_lunbo_all(curr);
+                this.loading = true;
+            },
+            //添加轮播
+            lunbo_open(){
+
+            }
+
+        }
+    }
+</script>
+
+<style scoped>
+
+</style>

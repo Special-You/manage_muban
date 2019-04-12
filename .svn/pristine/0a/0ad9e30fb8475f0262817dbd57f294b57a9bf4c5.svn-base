@@ -1,0 +1,56 @@
+<template>
+    <div>
+        <Banner></Banner>
+        <!--<Row style="margin: -24px -24px 30px -24px;background-color: #fff;-->
+                <!--padding: 15px 20px; border-bottom: 1px solid #dcdee2;color: #fff;-->
+                <!--border-left: 8px solid #19be6b;-->
+                <!--">-->
+            <!--<Col span="24">-->
+                <!--<Breadcrumb style="font-size: 14px;">-->
+                    <!--<BreadcrumbItem to="/">您的位置  >主页面 </BreadcrumbItem>-->
+                <!--</Breadcrumb>-->
+            <!--</Col>-->
+        <!--</Row>-->
+        <!--<h2 class="title">后台管理系统</h2>-->
+        <img class="wel_img" src="../assets/imgs/up.png" alt="">
+    </div>
+</template>
+
+<script>
+    import Banner from '../components/Barner'
+    export default {
+        name: "Welcome",
+        components:{
+            Banner
+        },
+        created(){
+            this.clear_meau();
+        },
+        methods:{
+            clear_meau(){
+                this.$store.state.meau_name = '主页面';
+                // this.$router.push({path:'/'});
+            },
+        }
+    }
+</script>
+
+<style scoped>
+    .wel_img{
+        display: block;
+        width: 450px;
+        margin: 100px auto 20px;
+        color: transparent;
+    }
+    .title {
+        margin: 20px 50px;
+        font-weight: bold;
+        font-size: 26px;
+        letter-spacing: 5px;
+        color: #1f83e2;
+    }
+    .men{
+        font-size: 20px;
+        color: blueviolet;
+    }
+</style>

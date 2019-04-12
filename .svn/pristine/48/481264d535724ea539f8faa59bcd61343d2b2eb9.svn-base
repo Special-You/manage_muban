@@ -1,0 +1,65 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+import Main from './views/Main.vue'
+
+Vue.use(Router)
+
+const router = new Router({
+    // mode: 'history',
+    linkActiveClass:'active',
+    base: process.env.BASE_URL,
+    routes: [
+        {
+            path: '/login',
+            name: 'login',
+            component: () => import('./views/Login.vue')
+        },
+        {
+            path: '/',
+            name: 'main',
+            component: Main,
+            meta: {
+                requiresAuth:true
+            },
+            children:[
+                {
+                    path: '/',
+                    name: 'Welcome',
+                    component:() => import('./views/Welcome.vue')
+                },
+                {
+                    path: 'memMan',
+                    name: 'MemMan',
+                    component:() => import('./views/MemberManage/MemMan.vue')
+                },
+                {
+                    path: 'goodsMan',
+                    name: 'goodsMan',
+                    component:() => import('./views/GoodsManage/GoodsMan.vue')
+                },
+                {
+                    path: 'addList',
+                    name: 'addList',
+                    component:() => import('./views/UserManage/AddList.vue')
+                },
+            ]
+        },
+
+    ]
+});
+
+router.beforeEach((to, from, next) => {
+    var token = localStorage.getItem('_token');
+    if (to.matched.some(record => record.meta.requiresAuth)&&(!token || token === null)) {
+        next({
+            path: '/login',
+            query: {
+                redirect:to.fullPath
+            }
+        })
+    } else {
+        next()
+    }
+});
+
+export default router;

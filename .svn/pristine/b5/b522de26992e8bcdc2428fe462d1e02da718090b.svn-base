@@ -1,0 +1,116 @@
+<template>
+        <div class="bg" >
+        <div class="title">后台管理系统</div>
+        <div class="login">
+            <div style="width: 300px;">
+                <!--<p slot="title" style="text-align: center">-->
+                    <!--OA后台管理系统-->
+                <!--</p>-->
+                <div>
+                <Form :model="loginInfo" ref="loginInfo" :rules="ruleForm" :loading = 'loading'>
+                    <FormItem prop="phone">
+                        <Input prefix="ios-call" v-model="loginInfo.phone" placeholder="请输入账号" size="large" type="text" class="account">
+
+                        </Input>
+                    </FormItem>
+                    <FormItem prop="password">
+                        <Input prefix="md-lock" v-model="loginInfo.password" placeholder="请输入密码" size="large" type="password" class="password" @on-enter="submitForm('loginInfo')">
+
+                        </Input>
+                    </FormItem>
+                    <FormItem style="margin-top: 20px; text-align: center">
+                        <Button type="primary" @click="submitForm('loginInfo')" style="margin-right: 20px;">登录</Button>
+                        <Button @click="resetForm('loginInfo')">重置</Button>
+                    </FormItem>
+                </Form>
+                </div>
+            </div>
+        </div>
+        </div>
+</template>
+
+<script>
+    export default {
+        name: "Login",
+        data() {
+            return {
+                loading:true,
+                loginInfo: {
+                    phone: '',
+                    password: '',
+                },
+                ruleForm: {
+                    phone: [{required: true, message: '账号必填', trigger: 'blur'}],
+                    password: [{required: true, message: '密码必填', trigger: 'blur'}]
+                }
+            }
+        },
+        methods:{
+            submitForm(name){
+                this.$refs[name].validate(valid =>{
+                    if(valid){
+                        let params = this.loginInfo;
+                        $api.http.post($api.login,params)
+                            .then(data=>{
+                                if(data.flag === 1){
+                                    let self = this;
+                                    this.loading = false;
+                                    this.$Message.success('登录成功！');
+                                    setTimeout(function () {
+                                        self.$router.push('/');
+                                    },1500);
+                                    localStorage.setItem('_token',data.data.token);
+                                    localStorage.setItem('name',data.data.data.name);
+                                    localStorage.setItem('id',data.data.data.id);
+                                    // console.log(localStorage.getItem('_token'),444)
+                                }else {
+                                    this.$Message.error(data.message);
+                                }
+                            })
+                            .catch(error=>{
+                                this.$Message.error('网络请求失败');
+                            })
+                    }else {
+                        this.$Message.error('请输入账号或密码！')
+                    }
+                })
+            },
+            resetForm(name){
+                this.$refs[name].resetFields();
+            }
+        }
+    }
+</script>
+
+<style scoped>
+    .bg {
+        background-image: url("../assets/imgs/bg_2.png");
+        height: 100%;
+        background-size: cover;
+    }
+    .title{
+        color: aliceblue;
+        font-size: 40px;
+        letter-spacing: 8px;
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .login {
+        border-radius: 10px;
+        padding: 20px 40px;
+        background-color: rgba(255,255,255,.5);
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .account{
+        margin-top: 20px;
+    }
+     .password{
+         /*margin-top: 20px;*/
+        /*width: 300px;*/
+    }
+</style>

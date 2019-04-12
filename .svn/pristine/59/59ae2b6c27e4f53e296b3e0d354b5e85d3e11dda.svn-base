@@ -1,0 +1,349 @@
+<template>
+    <div class="layout">
+        <Layout>
+            <Sider :style="{height: '98vh',overflow:'hidden'}" ref="side1" default-collapsed width="210" hide-trigger collapsible
+                   :collapsed-width="0" v-model="isCollapsed">
+                <div style="margin-top: 20px; text-align: center">
+                    <Avatar size="large" src="https://i.loli.net/2017/08/21/599a521472424.jpg"/>
+                    <!--<Avatar size="large" src="http://image.baidu.com/search/detail?ct=503316480&z=0&ipn=false&word=touxiang&step_word=&hs=2&pn=69&spn=0&di=92427319381&pi=0&rn=1&tn=baiduimagedetail&is=0%2C0&istype=2&ie=utf-8&oe=utf-8&in=&cl=2&lm=-1&st=-1&cs=71239636%2C3564844612&os=1888453981%2C1427750542&simid=0%2C0&adpicid=0&lpn=0&ln=3340&fr=&fmq=1552553683185_R&fm=detail&ic=&s=undefined&hd=&latest=&copyright=&se=&sme=&tab=0&width=&height=&face=undefined&ist=&jit=&cg=head&bdtype=0&oriquery=&objurl=http%3A%2F%2Ftx.haiqq.com%2Fuploads%2Fallimg%2F150323%2F15134Qb0-0.jpg&fromurl=ippr_z2C%24qAzdH3FAzdH3Fpx_z%26e3Biwtqq_z%26e3Bv54AzdH3Fp57xtwg2AzdH3Fm8na_z%26e3Bip4s&gsm=1e&rpstart=0&rpnum=0&islist=&querylist=&force=undefined" />-->
+                </div>
+                <div class="layout-logo">天然工坊</div>
+                <Menu active-name="2" theme="dark" width="auto" accordion>
+                    <Submenu :name=index+1 v-for="(item,index) in list" :key=index+1>
+                        <template slot="title">
+                            <Icon :type=item.icon :style="{fontSize:'18px', color: '#fff', marginRight:'15px'}" />
+                            <span :style="{fontSize:'16px'}">{{item.title}}</span>
+                        </template>
+                        <MenuItem :name=index-i+1 :to=meau.url v-for="(meau,i) in item.children" :key=i+1>
+                            <Icon :type=meau.icon :style="{fontSize:'18px', color: '#fff'}" />
+                            <span :style="{fontSize:'14px'}">{{meau.name}}</span>
+                        </MenuItem>
+                    </Submenu>
+                </Menu>
+            </Sider>
+            <Layout :style="{minHeight: '100vh'}">
+                <Header style="background-color: #17233d">
+                    <Row>
+                        <Col :sm="2" :md="2" :lg="2">
+                            <Icon @click.native="collapsedSider" :class="rotateIcon" :style="{ color:'#fff'}"
+                                  type="md-menu" size="24"></Icon>
+                        </Col>
+                        <Col :sm="4" :md="4" :lg="4" class="head_font">
+                            <Button size="small" shape="circle" type="dashed" ghost>{{time}}</Button>
+                        </Col>
+                        <Col :sm="12" :md="12" :lg="12" style="text-align: center">
+                            <span style="color: #f8f8f9; font-size: 22px; letter-spacing: 5px">天然工坊</span>
+                        </Col>
+                        <Col :sm="2" :md="2" :lg="2" style="text-align: center">
+                            .
+                        </Col>
+                        <Col :sm="2" :md="2" :lg="2">
+                            <Button size="small" shape="circle" type="dashed" ghost @click="click_updatePassword">修改密码
+                            </Button>
+                        </Col>
+                        <Col :sm="2" :md="2" :lg="2">
+                            <a href="#">
+                                <Tooltip content="退出" placement="right">
+                                    <Button shape="circle" type="dashed" ghost icon="md-log-out"
+                                            @click="login_out"></Button>
+                                </Tooltip>
+                            </a>
+                        </Col>
+                    </Row>
+                </Header>
+                <Content :style="{padding: '24px', background: '#f8f8f9', boxShadow:'0px 0px 2px rgba(0,0,0,.2)'}">
+                    <router-view></router-view>
+                </Content>
+                <Footer :style="{borderTop:'1px solid #e8eaec'}">
+                    2019-2022 &copy; 河南优胜教育
+                </Footer>
+            </Layout>
+        </Layout>
+        <Modal v-model="updatePassword" width="30%" @on-ok="commitPassword('passwordUpdate')"
+               @on-cancel="updatePassword = false">
+            <p slot="header" style="color:#f60;text-align:center">
+                <span>修改密码</span>
+            </p>
+            <div style="padding: 20px 50px">
+                <Form :model="passwordUpdate" :rules="passwordUpdateRule" ref="passwordUpdate">
+                    <FormItem label="设置新密码：" prop="password">
+                        <Input v-model="passwordUpdate.password" placeholder="设置新密码"
+                               type="text" >
+                        </Input>
+                    </FormItem>
+                    <FormItem label="再次输入新密码：" prop="password">
+                        <Input v-model="passwordUpdate.password" placeholder="设置新密码" type="text" >
+                        </Input>
+                    </FormItem>
+                </Form>
+            </div>
+        </Modal>
+    </div>
+</template>
+
+<script>
+    export default {
+        name: "Main",
+        data() {
+            return {
+                isCollapsed: false,
+                updatePassword: false,
+                time: new Date().toLocaleString(),
+                name: localStorage.getItem('name') || "",
+                list: [
+                    {
+                        icon: "logo-playstation",
+                        title: '会员管理',
+                        children: [
+                            {
+                                name: '会员管理',
+                                icon: 'md-jet',
+                                url: '/memMan'
+                            },
+                        ]
+                    },
+                    {
+                        icon: "ios-american-football",
+                        title: '商品管理',
+                        children: [
+                            {
+                                name: '商品管理',
+                                icon: 'md-trending-up',
+                                url: '/goodsMan'
+                            },
+                        ]
+                    },
+                    {
+                        icon: "ios-contact",
+                        title: '用户管理',
+                        children: [
+                            {
+                                name: '用户管理',
+                                icon: 'md-archive',
+                                url: ''
+                            },
+                        ]
+                    },
+                    {
+                        icon: "ios-image-outline",
+                        title: 'Banner图管理',
+                        children: [
+                            {
+                                name: 'Banner图管理',
+                                icon: 'md-person-add',
+                                url: ''
+                            },
+                        ]
+                    },
+                    {
+                        icon: "md-paper",
+                        title: '订单管理',
+                        children: [
+                            {
+                                name: '订单管理',
+                                icon: 'md-paper',
+                                url: ''
+                            },
+                        ]
+                    },
+                    {
+                        icon: "ios-nuclear",
+                        title: '积分管理',
+                        children: [
+                            {
+                                name: '积分管理',
+                                icon: 'md-pie',
+                                url: '/finTj'
+                            },
+                        ]
+                    },
+                ],
+                passwordUpdate: {
+                    password: '',
+                    id: localStorage.getItem('id')
+                },
+                passwordUpdateRule: {
+                    password: [{required: true, message: '必填', trigger: 'blur'}],
+                }
+            }
+        },
+        created() {
+            this.get_time();
+            console.log(this.time)
+        },
+        computed: {
+            rotateIcon() {
+                return [
+                    'menu-icon',
+                    this.isCollapsed ? 'rotate-icon' : ''
+                ];
+            },
+            menuitemClasses() {
+                return [
+                    'menu-item',
+                    this.isCollapsed ? 'collapsed-menu' : ''
+                ]
+            }
+        },
+        methods: {
+            // change(name) {
+            //     console.log(name);
+            // },
+            collapsedSider() {
+                this.$refs.side1.toggleCollapse();
+            },
+            click_updatePassword() {
+                this.updatePassword = true;
+            },
+            login_out() {
+                this.$router.push('Login');
+                localStorage.clear('_token');
+            },
+            commitPassword(name) {
+                this.$refs[name].validate(valid => {
+                    if (valid) {
+                        $api.http.post($api.update_emp, this.passwordUpdate)
+                            .then(data => {
+                                if (data.flag === 1) {
+                                    this.$Message.success('修改成功！');
+                                    this.passwordUpdate = {
+                                        password: '',
+                                        id: localStorage.getItem('id')
+                                    };
+                                } else {
+                                    if (data.message === 'token is invalid') {
+                                        this.$router.push('Login')
+                                    } else {
+                                        this.$Message.warning(data.message);
+                                    }
+                                }
+                            })
+                            .catch(error => {
+                                this.$Message.error('请求数据失败')
+                            })
+                    } else {
+                        this.$Message.error('请输入密码！')
+                    }
+                })
+
+            },
+            get_time() {
+                setInterval(function () {
+                    let self = this;
+                    self.time = new Date().toLocaleString();
+                }, 1000);
+            }
+        }
+    }
+</script>
+
+<style scoped>
+    .menu-icon {
+        transition: all .3s;
+    }
+
+    .rotate-icon {
+        transform: rotate(-90deg);
+    }
+
+    .ivu-menu-submenu-title {
+        display: inline-block;
+        overflow: hidden;
+        width: 69px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: bottom;
+        transition: width .2s ease .2s;
+    }
+
+    .menu-item i {
+        transform: translateX(0px);
+        transition: font-size .2s ease, transform .2s ease;
+        vertical-align: middle;
+        font-size: 16px;
+    }
+
+    .collapsed-menu span {
+        width: 0px;
+        transition: width .2s ease;
+    }
+
+    .collapsed-menu i {
+        transform: translateX(5px);
+        transition: font-size .2s ease .2s, transform .2s ease .2s;
+        vertical-align: middle;
+        font-size: 22px;
+    }
+
+    .layout {
+        /*border: 1px solid transparent;*/
+        background: #f5f7f9;
+        position: relative;
+        border-radius: 4px;
+        /*overflow: hidden;*/
+        height: 100%;
+        /*height: inherit;*/
+    }
+
+    a {
+        color: #333;
+    }
+
+    /*.header {*/
+    /*height: 50px;*/
+    /*}*/
+
+    .layout-logo {
+        height: 56px;
+        color: #fff;
+        letter-spacing: 3px;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        line-height: 60px;
+        /*background: #5b6270;*/
+        border-radius: 3px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #e8eaec;
+    }
+
+    .ivu-layout-footer {
+        background: #f8f8f9;
+        padding: 20px 50px;
+        color: #515a6e;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .login {
+        line-height: 60px;
+    }
+
+    .drop-down {
+        font-size: 14px;
+        color: #ebfffe;
+    }
+
+    /*.layout-nav {*/
+    /*width: 420px;*/
+    /*margin: 0 auto;*/
+    /*margin-right: 20px;*/
+    /*}*/
+
+    .collapsed-menu span {
+        width: 0px;
+        transition: width .2s ease;
+    }
+
+    .collapsed-menu i {
+        transform: translateX(5px);
+        transition: font-size .2s ease .2s, transform .2s ease .2s;
+        vertical-align: middle;
+        font-size: 22px;
+    }
+
+    .ivu-layout-sider-children {
+        background-color: blueviolet;
+    }
+
+</style>

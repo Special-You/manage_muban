@@ -1,0 +1,59 @@
+import axios from 'axios'
+
+let api = api || {};
+
+// api.baseUrl = 'http://47.104.77.99:8085/OA';
+api.baseUrl = '/api';
+
+// let _token = localStorage.getItem('_token');
+const http = axios.create({
+    headers :{
+        'Content-Type':'application/json',
+        // 'token':_token
+    },
+    timeout:3000
+});
+
+ axios.defaults.baseURL = api.baseUrl;
+
+http.interceptors.request.use(
+    config =>{
+        config.headers.token = localStorage.getItem('_token');
+        if(config.method === 'post'){
+            config.data = JSON.stringify(config.data);
+        }
+        return config;
+    },
+    error => {
+        return Promise.reject(error);
+    }
+);
+
+http.interceptors.response.use(
+    res =>{
+        if(res.status === 200){
+            return res.data;
+        }else{
+            return {
+                message:"请求数据失败"
+            }
+        }
+    },
+    error => {
+        return Promise.reject(error);
+    }
+);
+
+api.http = http;
+
+//接口请求
+api.login = '/emp/behindLogin';
+api.update_emp = '/emp/update';
+/**
+ * 会员管理接口
+ */
+//会员接口
+
+
+
+export {api};
